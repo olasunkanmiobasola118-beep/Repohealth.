@@ -15,3 +15,6 @@ class Config:
     # Listen only on this computer by default.
     HOST = os.getenv("HOST", "127.0.0.1")
     PORT = int(os.getenv("PORT", "5000"))
+
+    # Reject request bodies larger than 4 KB. Scan requests are tiny.
+    MAX_CONTENT_LENGTH = 4 * 1024
