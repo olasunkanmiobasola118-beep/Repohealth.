@@ -104,3 +104,81 @@ body {
   background: var(--rh-accent);
   color: #06210f;
 }
+
+/* ===== Scan status panel ===== */
+.rh-spinner {
+  color: var(--rh-accent);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.rh-search .form-control.is-invalid {
+  border-color: #f87171;
+}
+/* ===== Sample report ===== */
+.rh-badge-sample {
+  background-color: transparent;
+  border: 1px solid var(--rh-accent);
+  color: var(--rh-accent);
+  font-weight: 600;
+}
+
+.rh-score-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 9rem;
+  height: 9rem;
+  border: 6px solid var(--rh-accent);
+  border-radius: 50%;
+}
+
+.rh-score-number {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rh-score-label {
+  color: var(--rh-muted);
+  font-size: 0.85rem;
+}
+
+.rh-progress {
+  height: 0.6rem;
+  background-color: var(--rh-border);
+}
+
+.rh-bar {
+  background-color: var(--rh-accent);
+}
+
+.rh-finding {
+  padding: 1rem 0;
+  border-top: 1px solid var(--rh-border);
+}
+
+.rh-kind {
+  background-color: transparent;
+  border: 1px solid var(--rh-border);
+  color: var(--rh-muted);
+  font-weight: 500;
+}
+
+/* Severity badges: the text label always carries the meaning, color only supports it */
+.rh-sev-high {
+  background-color: #f87171;
+  color: #1a0505;
+}
+.rh-sev-medium {
+  background-color: #fbbf24;
+  color: #241a00;
+}
+.rh-sev-low {
+  background-color: #60a5fa;
+  color: #04162e;
+}
+.rh-sev-info {
+  background-color: #94a3b8;
+  color: #0b1220;
+}
