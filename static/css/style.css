@@ -1,0 +1,106 @@
+/* ===== Theme colors ===== */
+:root {
+  --rh-bg: #0b1220; /* dark navy page background */
+  --rh-surface: #141b2b; /* deep charcoal cards and bars */
+  --rh-border: #26304a; /* subtle borders */
+  --rh-text: #f1f5f9; /* near-white text */
+  --rh-muted: #94a3b8; /* muted gray text */
+  --rh-accent: #2ee66b; /* electric green */
+  --rh-accent-dark: #22c458; /* hover state */
+}
+
+/* Make Bootstrap's dark theme use our colors */
+[data-bs-theme="dark"] {
+  --bs-body-bg: var(--rh-bg);
+  --bs-body-color: var(--rh-text);
+  --bs-secondary-color: var(--rh-muted);
+  --bs-border-color: var(--rh-border);
+}
+
+body {
+  background-color: var(--rh-bg);
+  color: var(--rh-text);
+}
+
+/* ===== Helpers ===== */
+.rh-accent {
+  color: var(--rh-accent);
+}
+
+.rh-eyebrow {
+  color: var(--rh-accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ===== Navbar and footer ===== */
+.rh-navbar {
+  background-color: var(--rh-surface);
+  border-bottom: 1px solid var(--rh-border);
+}
+
+.rh-footer {
+  border-top: 1px solid var(--rh-border);
+}
+
+/* ===== Hero ===== */
+.rh-hero {
+  border-bottom: 1px solid var(--rh-border);
+}
+
+.rh-search .form-control,
+.rh-search .input-group-text {
+  background-color: var(--rh-surface);
+  border-color: var(--rh-border);
+  color: var(--rh-text);
+}
+
+.rh-search .form-control::placeholder {
+  color: var(--rh-muted);
+}
+
+/* ===== Buttons ===== */
+.btn-accent {
+  background-color: var(--rh-accent);
+  border-color: var(--rh-accent);
+  color: #06210f; /* dark text keeps good contrast on green */
+  font-weight: 600;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: var(--rh-accent-dark);
+  border-color: var(--rh-accent-dark);
+  color: #06210f;
+}
+
+/* ===== Cards ===== */
+.rh-card {
+  background-color: var(--rh-surface);
+  border: 1px solid var(--rh-border);
+  border-radius: 0.75rem;
+}
+
+.rh-card-icon {
+  color: var(--rh-accent);
+  font-size: 1.75rem;
+}
+
+/* ===== Accessibility ===== */
+/* A clear outline for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--rh-accent);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  padding: 0.5rem 1rem;
+  background: var(--rh-accent);
+  color: #06210f;
+}
