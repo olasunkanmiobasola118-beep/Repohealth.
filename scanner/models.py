@@ -1,3 +1,4 @@
+
 """Shared data structures for the scanner.
 
 Finding      - the result of one check (passed, failed, or not assessed)
@@ -93,6 +94,31 @@ class RepoSnapshot:
             actual = self._paths.get(candidate.lower())
             if actual is not None:
                 return actual
+        return None
+
+    def find_in_folder(self, folder, extensions=None, ignore=()):
+        """Return the first file directly inside `folder`, or None.
+
+        Matching ignores upper/lower case, and files in sub-folders do not
+        count. `extensions` (for example (".md", ".yml")) limits which files
+        match, and `ignore` lists lower-case file names to skip. When several
+        files match, the first one in alphabetical order is returned, so the
+        result is always the same for the same repository.
+        """
+        prefix = folder.lower().rstrip("/") + "/"
+        wanted = tuple(extensions) if extensions else None
+
+        for lower_path in sorted(self._paths):
+            if not lower_path.startswith(prefix):
+                continue
+            name = lower_path[len(prefix):]
+            if not name or "/" in name:
+                continue
+            if wanted and not name.endswith(wanted):
+                continue
+            if name in ignore:
+                continue
+            return self._paths[lower_path]
         return None
 
     def read(self, path):

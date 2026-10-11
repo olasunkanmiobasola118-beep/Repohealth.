@@ -1,12 +1,18 @@
 """Tests for the Flask routes in app.py.
 
-GitHub is never contacted: we replace fetch_repo_metadata with a fake.
+GitHub is never contacted: we replace the network-using functions with fakes.
 """
 
 import pytest
 
 import app as app_module
 from scanner.github_client import GitHubError
+
+FAKE_ANALYSIS = {
+    "findings": [{"id": "docs.readme.present", "status": "passed"}],
+    "warnings": ["a note"],
+    "file_list": {"available": True, "complete": True},
+}
 
 
 @pytest.fixture
@@ -37,14 +43,20 @@ def test_scan_rejects_get_requests(client):
 
 # ---------- /api/scan: success ----------
 
-def test_scan_success_passes_parsed_owner_and_repo(client, monkeypatch):
-    calls = []
+def test_scan_success_returns_metadata_and_findings(client, monkeypatch):
+    fetch_calls = []
+    analyze_calls = []
 
     def fake_fetch(owner, repo):
-        calls.append((owner, repo))
-        return {"full_name": f"{owner}/{repo}"}
+        fetch_calls.append((owner, repo))
+        return {"full_name": f"{owner}/{repo}", "default_branch": "main"}
+
+    def fake_analyze(owner, repo, metadata):
+        analyze_calls.append((owner, repo, metadata))
+        return FAKE_ANALYSIS
 
     monkeypatch.setattr(app_module, "fetch_repo_metadata", fake_fetch)
+    monkeypatch.setattr(app_module, "analyze_repository", fake_analyze)
 
     response = client.post(
         "/api/scan", json={"repo_url": "https://github.com/pallets/flask.git"}
@@ -55,8 +67,12 @@ def test_scan_success_passes_parsed_owner_and_repo(client, monkeypatch):
     assert body["status"] == "ok"
     assert "scanned_at" in body
     assert body["repository"]["full_name"] == "pallets/flask"
+    assert body["findings"] == FAKE_ANALYSIS["findings"]
+    assert body["warnings"] == ["a note"]
+    assert body["file_list"] == {"available": True, "complete": True}
     # The route passed the parsed names, not the raw URL.
-    assert calls == [("pallets", "flask")]
+    assert fetch_calls == [("pallets", "flask")]
+    assert analyze_calls[0][:2] == ("pallets", "flask")
 
 
 # ---------- /api/scan: bad input ----------
@@ -112,11 +128,29 @@ def test_scan_maps_github_errors_to_json(client, monkeypatch):
     }
 
 
-def test_scan_hides_details_of_unexpected_errors(client, monkeypatch):
+def test_analysis_is_skipped_when_the_repository_is_not_found(client, monkeypatch):
+    analyze_calls = []
+
     def fake_fetch(owner, repo):
-        raise RuntimeError("secret internal detail")
+        raise GitHubError("not_found", "Repository not found.", 404)
 
     monkeypatch.setattr(app_module, "fetch_repo_metadata", fake_fetch)
+    monkeypatch.setattr(
+        app_module, "analyze_repository", lambda *args: analyze_calls.append(args)
+    )
+
+    client.post("/api/scan", json={"repo_url": "https://github.com/a/b"})
+
+    assert analyze_calls == []
+
+
+def test_scan_hides_details_of_unexpected_errors(client, monkeypatch):
+    monkeypatch.setattr(app_module, "fetch_repo_metadata", lambda owner, repo: {})
+
+    def fake_analyze(owner, repo, metadata):
+        raise RuntimeError("secret internal detail")
+
+    monkeypatch.setattr(app_module, "analyze_repository", fake_analyze)
 
     response = client.post("/api/scan", json={"repo_url": "https://github.com/a/b"})
 

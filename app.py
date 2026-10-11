@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, render_template, request
 
 from config import Config
+from scanner.engine import analyze_repository
 from scanner.github_client import GitHubError, fetch_repo_metadata, parse_repo_url
 
 
@@ -37,6 +38,7 @@ def create_app():
         try:
             owner, repo = parse_repo_url(data["repo_url"])
             metadata = fetch_repo_metadata(owner, repo)
+            analysis = analyze_repository(owner, repo, metadata)
         except GitHubError as exc:
             return error_response(exc.code, exc.message, exc.status)
         except Exception:
@@ -51,6 +53,9 @@ def create_app():
                 "status": "ok",
                 "scanned_at": datetime.now(timezone.utc).isoformat(),
                 "repository": metadata,
+                "findings": analysis["findings"],
+                "warnings": analysis["warnings"],
+                "file_list": analysis["file_list"],
             }
         )
 
@@ -65,4 +70,3 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG)
-    
