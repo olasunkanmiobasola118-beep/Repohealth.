@@ -103,7 +103,7 @@ def test_documentation_checks_pass_with_complete_data(fake_github):
 
 def test_all_check_modules_contribute_findings(fake_github):
     result = engine.analyze_repository("octo", "demo", METADATA)
-    assert len(result["findings"]) == 11   # 6 documentation + 5 contribution
+    assert len(result["findings"]) == 16   # 6 documentation + 5 contribution + 5 testing
 
 
 def test_contribution_checks_fail_when_the_files_are_missing(fake_github):
@@ -233,3 +233,50 @@ def test_repeated_warnings_are_listed_once(fake_github, monkeypatch):
 
     assert result["findings"] == []
     assert len(result["warnings"]) == 1
+
+# ---------- Testing and CI checks ----------
+
+WORKFLOW = """name: CI
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pytest pytest-cov
+      - run: pytest --cov
+"""
+
+
+def test_testing_checks_fail_for_a_repository_without_tests(fake_github):
+    result = engine.analyze_repository("octo", "demo", METADATA)
+
+    assert statuses(result, "testing.") == {
+        "testing.tests.present": "failed",
+        "testing.ci.present": "failed",
+        "testing.ci.runs_tests": "failed",
+        "testing.coverage": "failed",
+        "testing.docs": "not_assessed",
+    }
+
+
+def test_testing_checks_use_real_workflow_data(fake_github):
+    fake_github["tree"] = (
+        ["README.md", "tests/test_app.py", ".github/workflows/ci.yml"], False
+    )
+    fake_github["files"][".github/workflows/ci.yml"] = (WORKFLOW, False)
+
+    result = engine.analyze_repository("octo", "demo", METADATA)
+
+    assert statuses(result, "testing.") == {
+        "testing.tests.present": "passed",
+        "testing.ci.present": "passed",
+        "testing.ci.runs_tests": "passed",
+        "testing.coverage": "passed",
+        "testing.docs": "failed",   # the README has no testing section
+    }
+    # README and the workflow are each fetched exactly once.
+    assert fake_github["file_calls"] == [
+        ("octo", "demo", "README.md"),
+        ("octo", "demo", ".github/workflows/ci.yml"),
+    ]

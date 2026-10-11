@@ -10,12 +10,13 @@ from scanner.contributions import run_contribution_checks
 from scanner.documentation import run_documentation_checks
 from scanner.github_client import GitHubError, fetch_file_text, fetch_repo_tree
 from scanner.models import RepoSnapshot
+from scanner.testing import run_testing_checks
 
 logger = logging.getLogger(__name__)
 
 # Each runner takes a RepoSnapshot and returns a list of Findings.
 # New check modules (testing, dependencies, security) are added here in later parts.
-CHECK_RUNNERS = [run_documentation_checks, run_contribution_checks]
+CHECK_RUNNERS = [run_documentation_checks, run_contribution_checks, run_testing_checks]
 
 
 def _add_warning(warnings, message):

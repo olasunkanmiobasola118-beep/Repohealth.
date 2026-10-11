@@ -1,4 +1,3 @@
-
 """Shared data structures for the scanner.
 
 Finding      - the result of one check (passed, failed, or not assessed)
@@ -83,6 +82,11 @@ class RepoSnapshot:
         """True only if the file list is complete, so 'not found' means missing."""
         return self.tree_available and not self.truncated
 
+    @property
+    def paths(self):
+        """Every file path in the file list (as GitHub spelled it), sorted."""
+        return sorted(self._paths.values())
+
     def find(self, candidates):
         """Return the real path of the first matching file, or None.
 
@@ -105,8 +109,14 @@ class RepoSnapshot:
         files match, the first one in alphabetical order is returned, so the
         result is always the same for the same repository.
         """
+        found = self.list_in_folder(folder, extensions, ignore)
+        return found[0] if found else None
+
+    def list_in_folder(self, folder, extensions=None, ignore=()):
+        """Like find_in_folder, but returns every matching path, sorted."""
         prefix = folder.lower().rstrip("/") + "/"
         wanted = tuple(extensions) if extensions else None
+        found = []
 
         for lower_path in sorted(self._paths):
             if not lower_path.startswith(prefix):
@@ -118,8 +128,8 @@ class RepoSnapshot:
                 continue
             if name in ignore:
                 continue
-            return self._paths[lower_path]
-        return None
+            found.append(self._paths[lower_path])
+        return found
 
     def read(self, path):
         """Read a file (cached, and limited in number). Returns FileText or None."""
