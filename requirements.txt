@@ -1,3 +1,5 @@
+Flask==3.1.0
+python-dotenv==1.0.1
 aptdaemon==2.0.2
 argcomplete==3.6.3
 attrs==25.4.0
