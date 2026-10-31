@@ -26,6 +26,26 @@ const panels = {
   error: document.getElementById("state-error"),
 };
 
+// First-load motion is presentational and never delays interaction.
+if (
+  window.gsap &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+) {
+  const intro = window.gsap.timeline({ defaults: { ease: "power3.out" } });
+  intro.from(".rh-hero-copy > *", {
+    y: 14,
+    autoAlpha: 0,
+    duration: 0.55,
+    stagger: 0.055,
+    clearProps: "all",
+  });
+  intro.from(
+    ".rh-hero-aside",
+    { y: 12, autoAlpha: 0, duration: 0.6, clearProps: "all" },
+    "-=0.38",
+  );
+}
+
 // ----- Small helper functions -----
 
 // Show one panel and hide the others.
@@ -153,14 +173,15 @@ form.addEventListener("submit", async function (event) {
 
   // textContent (not innerHTML) so user text is never treated as HTML.
   loadingRepo.textContent = result.owner + "/" + result.repo;
+  window.clearReport();
   showState("loading");
   setBusy(true);
 
   try {
     const data = await scanRepository(result.owner, result.repo);
     // Stage 5 will draw the real report from `data` here.
-    console.log("Scan response:", data);
-    showState("empty");
+    window.renderReport(data);
+    showState("none");
   } catch (error) {
     errorMessage.textContent = error.message;
     showState("error");

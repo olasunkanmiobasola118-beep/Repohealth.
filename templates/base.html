@@ -39,9 +39,15 @@
         aria-label="Main navigation"
       >
         <div class="container">
-          <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
-            <i class="bi bi-heart-pulse-fill rh-accent" aria-hidden="true"></i>
-            RepoHealth
+          <a
+            class="navbar-brand fw-bold rh-brand"
+            href="{{ url_for('index') }}"
+            aria-label="RepoHealth home"
+          >
+            <span class="rh-brand-mark"
+              ><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i
+            ></span>
+            <span>repo<span class="rh-brand-accent">health</span></span>
           </a>
           <button
             class="navbar-toggler"
@@ -57,13 +63,10 @@
           <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link" href="#scan">Scan</a>
+                <a class="nav-link" href="#scan">Analyze</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#features">What we check</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#sample">Sample report</a>
+                <a class="nav-link" href="#checks">What we check</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#about">About</a>
@@ -78,8 +81,8 @@
 
     <footer class="rh-footer py-4 mt-5">
       <div class="container text-center text-secondary small">
-        RepoHealth is an open-source project. Reports are based on real
-        repository data, and a clean result is not a guarantee of security.
+        Built for clearer first looks at public projects. Reports are a starting
+        point for review—not a guarantee of quality or security.
       </div>
     </footer>
 

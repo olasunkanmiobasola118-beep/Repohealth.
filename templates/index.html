@@ -1,378 +1,318 @@
-{% extends "base.html" %} {% block title %}RepoHealth - GitHub repository health
-analyzer{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}RepoHealth — A clearer picture of
+your repository{% endblock %} {% block content %}
 
 <!-- Hero and search -->
-<section id="scan" class="rh-hero py-5">
-  <div class="container py-4">
-    <div class="row justify-content-center text-center">
-      <div class="col-lg-8">
-        <p class="rh-eyebrow mb-3">Open-source repository analyzer</p>
-        <h1 class="display-5 fw-bold mb-3">
-          Know how healthy your <span class="rh-accent">repository</span> really
-          is
-        </h1>
-        <p class="lead text-secondary mb-4">
-          Paste a public GitHub repository URL and get a report on
-          documentation, security hygiene, testing, dependencies, and
-          contributor-friendliness.
-        </p>
+<section id="scan" class="rh-hero">
+  <div class="container rh-hero-inner">
+    <div class="rh-hero-copy">
+      <p class="rh-eyebrow">
+        <span class="rh-eyebrow-dot"></span> Public repository analysis
+      </p>
+      <h1>
+        Know what your repository is <span class="rh-accent">ready for.</span>
+      </h1>
+      <p class="rh-hero-lede">
+        A practical health check for the foundations of an open-source project.
+        Get clear findings, useful evidence, and next steps—without cloning or
+        running code.
+      </p>
 
-        <form id="scan-form" class="rh-search" novalidate>
-          <label for="repo-url" class="visually-hidden"
-            >GitHub repository URL</label
-          >
-          <div class="input-group input-group-lg">
-            <span class="input-group-text" aria-hidden="true">
-              <i class="bi bi-github"></i>
-            </span>
-            <input
-              type="text"
-              id="repo-url"
-              name="repo_url"
-              class="form-control"
-              placeholder="https://github.com/owner/repository"
-              inputmode="url"
-              autocomplete="off"
-              spellcheck="false"
-              aria-describedby="repo-url-help repo-url-feedback"
-            />
-            <button type="submit" id="scan-button" class="btn btn-accent">
-              Analyze
-            </button>
-          </div>
-          <div id="repo-url-help" class="form-text text-start mt-2">
-            Public repositories only. No sign-in is needed.
-          </div>
-          <div
-            id="repo-url-feedback"
-            class="form-text text-danger text-start"
-            hidden
-          ></div>
-        </form>
+      <form id="scan-form" class="rh-search" novalidate>
+        <label for="repo-url" class="visually-hidden"
+          >GitHub repository URL</label
+        >
+        <div class="rh-input-wrap">
+          <i class="bi bi-github" aria-hidden="true"></i>
+          <input
+            type="text"
+            id="repo-url"
+            name="repo_url"
+            placeholder="github.com/owner/repository"
+            inputmode="url"
+            autocomplete="url"
+            spellcheck="false"
+            aria-describedby="repo-url-help repo-url-feedback"
+          />
+          <button type="submit" id="scan-button" class="btn btn-accent">
+            <span class="rh-button-label">Analyze repository</span>
+            <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <p id="repo-url-help" class="rh-input-help">
+          <i class="bi bi-lock" aria-hidden="true"></i> Public repositories only
+          <span aria-hidden="true">·</span> No sign-in required
+        </p>
+        <p
+          id="repo-url-feedback"
+          class="rh-input-feedback"
+          role="status"
+          hidden
+        ></p>
+      </form>
+
+      <div class="rh-trust-row" aria-label="How RepoHealth works">
+        <span
+          ><i class="bi bi-github" aria-hidden="true"></i> Uses public GitHub
+          data</span
+        >
+        <span
+          ><i class="bi bi-shield-check" aria-hidden="true"></i> Never runs
+          repository code</span
+        >
       </div>
     </div>
+
+    <aside class="rh-hero-aside" aria-label="What a scan examines">
+      <div class="rh-aside-topline">
+        <span class="rh-live-dot"></span> A focused project review
+      </div>
+      <h2>Healthy projects make the basics easy to find.</h2>
+      <p>
+        RepoHealth checks the signals that help maintainers and contributors get
+        oriented.
+      </p>
+      <div class="rh-signal-list">
+        <div class="rh-signal">
+          <span class="rh-signal-icon"
+            ><i class="bi bi-journal-text" aria-hidden="true"></i></span
+          ><span
+            ><strong>Project documentation</strong
+            ><small>README, license, and usage guidance</small></span
+          ><i
+            class="bi bi-arrow-up-right rh-signal-arrow"
+            aria-hidden="true"
+          ></i>
+        </div>
+        <div class="rh-signal">
+          <span class="rh-signal-icon"
+            ><i class="bi bi-check2-square" aria-hidden="true"></i></span
+          ><span
+            ><strong>Tests and automation</strong
+            ><small>Test files, CI, and test commands</small></span
+          ><i
+            class="bi bi-arrow-up-right rh-signal-arrow"
+            aria-hidden="true"
+          ></i>
+        </div>
+        <div class="rh-signal">
+          <span class="rh-signal-icon"
+            ><i class="bi bi-people" aria-hidden="true"></i></span
+          ><span
+            ><strong>Contributor readiness</strong
+            ><small>Guides, conduct, and templates</small></span
+          ><i
+            class="bi bi-arrow-up-right rh-signal-arrow"
+            aria-hidden="true"
+          ></i>
+        </div>
+      </div>
+      <div class="rh-aside-foot">
+        <i class="bi bi-info-circle" aria-hidden="true"></i> Findings are
+        signals—not a guarantee of quality or security.
+      </div>
+    </aside>
   </div>
 </section>
 
 <!-- Scan status: empty, loading, and error states -->
-<section class="py-5" aria-labelledby="status-heading">
+<section class="rh-status-section" aria-labelledby="status-heading">
   <div class="container">
     <h2 id="status-heading" class="visually-hidden">Scan status</h2>
-    <div id="status" class="rh-card p-4 p-md-5 text-center" aria-live="polite">
-      <div id="state-empty">
-        <i class="bi bi-search rh-card-icon" aria-hidden="true"></i>
-        <h3 class="h5 mt-3">No report yet</h3>
-        <p class="text-secondary mb-0">
-          Enter a public GitHub repository URL above to start a scan.
-        </p>
+    <div id="status" class="rh-status-panel" aria-live="polite">
+      <div id="state-empty" class="rh-state-empty">
+        <span class="rh-empty-icon"
+          ><i class="bi bi-search" aria-hidden="true"></i
+        ></span>
+        <div>
+          <h3>Start with a repository</h3>
+          <p>Paste a public GitHub URL above to see a real report here.</p>
+        </div>
+        <a class="rh-text-link" href="#how-it-works"
+          >How it works <i class="bi bi-arrow-down-right" aria-hidden="true"></i
+        ></a>
       </div>
-
-      <div id="state-loading" hidden>
-        <div class="spinner-border rh-spinner" aria-hidden="true"></div>
-        <h3 class="h5 mt-3">Scanning <span id="loading-repo"></span></h3>
-        <p class="text-secondary mb-0">
-          Contacting the server. This can take a few seconds.
-        </p>
+      <div id="state-loading" class="rh-state-loading" hidden>
+        <span class="rh-loading-mark" aria-hidden="true"
+          ><span></span><span></span><span></span
+        ></span>
+        <div>
+          <h3>Reviewing <span id="loading-repo"></span></h3>
+          <p>
+            Collecting repository metadata and checking project files. This can
+            take a few seconds.
+          </p>
+        </div>
       </div>
-
-      <div id="state-error" hidden>
-        <i
-          class="bi bi-exclamation-triangle text-warning fs-2"
-          aria-hidden="true"
-        ></i>
-        <h3 class="h5 mt-3">Scan could not be completed</h3>
-        <p id="error-message" class="text-secondary mb-0"></p>
+      <div id="state-error" class="rh-state-error" hidden>
+        <span class="rh-error-icon"
+          ><i class="bi bi-exclamation-circle" aria-hidden="true"></i
+        ></span>
+        <div>
+          <h3>We couldn’t complete that scan</h3>
+          <p id="error-message"></p>
+        </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- Scan results (filled in by report.js) -->
+<section
+  id="results"
+  class="rh-results-section"
+  aria-labelledby="results-heading"
+  hidden
+>
+  <div class="container">
+    <div class="rh-results-header">
+      <div class="rh-results-title">
+        <p class="rh-eyebrow">Repository report</p>
+        <h2 id="results-heading" tabindex="-1"></h2>
+        <p id="results-description" class="rh-results-description"></p>
+        <p id="results-meta" class="rh-results-meta"></p>
+      </div>
+      <a
+        id="results-link"
+        class="rh-github-link"
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+        ><i class="bi bi-github" aria-hidden="true"></i> Open on GitHub
+        <i class="bi bi-arrow-up-right" aria-hidden="true"></i
+      ></a>
+    </div>
+    <div id="results-summary" class="row g-3 rh-summary-grid"></div>
+    <p class="rh-report-note">
+      <i class="bi bi-info-circle" aria-hidden="true"></i> Counts represent
+      checks, not a score. A passed check is not a guarantee of quality or
+      security, and heuristic findings can be wrong.
+    </p>
+    <div id="results-warnings"></div>
+    <div id="results-findings" class="rh-findings"></div>
+    <p id="results-time" class="rh-results-time"></p>
   </div>
 </section>
 
 <!-- What we check -->
-<section id="features" class="py-5">
+<section id="checks" class="rh-checks-section" aria-labelledby="checks-heading">
   <div class="container">
-    <h2 class="h3 fw-bold text-center mb-2">What RepoHealth checks</h2>
-    <p class="text-secondary text-center mb-5">
-      Six categories, each scored separately and combined into one overall
-      score.
-    </p>
-
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i class="bi bi-file-text rh-card-icon" aria-hidden="true"></i>
-          <h3 class="h5 mt-3">Documentation</h3>
-          <p class="text-secondary mb-0">
-            README, license, and whether the docs explain how to install and use
-            the project.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i class="bi bi-shield-check rh-card-icon" aria-hidden="true"></i>
-          <h3 class="h5 mt-3">Security hygiene</h3>
-          <p class="text-secondary mb-0">
-            Security policy, risky configuration, and signs of exposed secrets.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i class="bi bi-check2-circle rh-card-icon" aria-hidden="true"></i>
-          <h3 class="h5 mt-3">Testing</h3>
-          <p class="text-secondary mb-0">
-            Test folders, test configuration, and automated workflows that run
-            tests.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i
-            class="bi bi-wrench-adjustable rh-card-icon"
-            aria-hidden="true"
-          ></i>
-          <h3 class="h5 mt-3">Maintainability</h3>
-          <p class="text-secondary mb-0">
-            How recently the project was updated and how its issues are managed.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i class="bi bi-box-seam rh-card-icon" aria-hidden="true"></i>
-          <h3 class="h5 mt-3">Dependencies</h3>
-          <p class="text-secondary mb-0">
-            Dependency manifests and lockfiles for common languages.
-          </p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="rh-card h-100 p-4">
-          <i class="bi bi-people rh-card-icon" aria-hidden="true"></i>
-          <h3 class="h5 mt-3">Contribution readiness</h3>
-          <p class="text-secondary mb-0">
-            Contributing guide, code of conduct, and issue and pull request
-            templates.
-          </p>
-        </div>
-      </div>
+    <div class="rh-section-heading">
+      <p class="rh-eyebrow">A useful starting point</p>
+      <h2 id="checks-heading">The foundations that keep projects moving.</h2>
+      <p>
+        Focused checks across the signals that make a repository easier to
+        understand, test, and contribute to.
+      </p>
     </div>
-  </div>
-</section>
-<!-- Sample report preview (static, fictional data) -->
-<section id="sample" class="py-5">
-  <div class="container">
-    <div
-      class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2"
-    >
-      <h2 class="h3 fw-bold mb-0">Example report</h2>
-      <span class="badge rh-badge-sample">Sample data, not a real scan</span>
-    </div>
-    <p class="text-secondary mb-4">
-      A preview of the layout a real report will use. The repository, scores,
-      and findings below are invented for illustration. Real scans will show
-      only data collected from the repository you enter.
-    </p>
-
-    <div
-      class="rh-card p-4"
-      role="group"
-      aria-label="Sample report preview. Not real scan data."
-    >
-      <div class="row g-4 align-items-center mb-4">
-        <div class="col-md-4 text-center">
-          <div
-            class="rh-score-circle mx-auto"
-            aria-label="Sample overall score: 70 out of 100"
-          >
-            <span class="rh-score-number">70</span>
-            <span class="rh-score-label">/ 100</span>
-          </div>
-          <p class="text-secondary small mt-2 mb-0">Overall score (sample)</p>
-        </div>
-        <div class="col-md-8">
-          <h3 class="h5">example-owner/example-repo</h3>
-          <p class="text-secondary mb-0">
-            A fictional project used to show how category scores and findings
-            are displayed. The scoring formula is explained in the real report
-            once it is built.
-          </p>
-        </div>
-      </div>
-
-      <h3 class="h6 text-uppercase text-secondary mb-3">Category scores</h3>
-      <div class="row g-3 mb-4">
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Documentation</span><span>85</span>
-          </div>
-          <div
-            class="progress rh-progress"
-            role="progressbar"
-            aria-label="Documentation sample score"
-            aria-valuenow="85"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <div class="progress-bar rh-bar" style="width: 85%"></div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Security hygiene</span><span>60</span>
-          </div>
-          <div
-            class="progress rh-progress"
-            role="progressbar"
-            aria-label="Security hygiene sample score"
-            aria-valuenow="60"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <div class="progress-bar rh-bar" style="width: 60%"></div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Testing</span><span>70</span>
-          </div>
-          <div
-            class="progress rh-progress"
-            role="progressbar"
-            aria-label="Testing sample score"
-            aria-valuenow="70"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <div class="progress-bar rh-bar" style="width: 70%"></div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Maintainability</span><span>78</span>
-          </div>
-          <div
-            class="progress rh-progress"
-            role="progressbar"
-            aria-label="Maintainability sample score"
-            aria-valuenow="78"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <div class="progress-bar rh-bar" style="width: 78%"></div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Dependencies</span
-            ><span class="text-secondary">Not assessed</span>
-          </div>
-          <div class="progress rh-progress" aria-hidden="true"></div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Contribution readiness</span><span>55</span>
-          </div>
-          <div
-            class="progress rh-progress"
-            role="progressbar"
-            aria-label="Contribution readiness sample score"
-            aria-valuenow="55"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <div class="progress-bar rh-bar" style="width: 55%"></div>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="h6 text-uppercase text-secondary mb-3">Findings (sample)</h3>
-      <ul class="list-unstyled mb-0">
-        <li class="rh-finding">
-          <span class="badge rh-sev rh-sev-high">High</span>
-          <span class="badge rh-kind">Heuristic warning</span>
-          <p class="mb-1 mt-2">
-            A string resembling an API key appears in a configuration file.
-          </p>
-          <p class="small text-secondary mb-0">
-            Evidence: <code>config/settings.py</code>, value redacted. Pattern
-            matching is a preliminary signal, not proof. Review the file and
-            rotate the key if it is real.
-          </p>
-        </li>
-        <li class="rh-finding">
-          <span class="badge rh-sev rh-sev-medium">Medium</span>
-          <span class="badge rh-kind">Objective check</span>
-          <p class="mb-1 mt-2">No <code>SECURITY.md</code> file was found.</p>
-          <p class="small text-secondary mb-0">
-            Add a security policy that explains how to report vulnerabilities
-            privately.
-          </p>
-        </li>
-        <li class="rh-finding">
-          <span class="badge rh-sev rh-sev-low">Low</span>
-          <span class="badge rh-kind">Objective check</span>
-          <p class="mb-1 mt-2">No pull request template was found.</p>
-          <p class="small text-secondary mb-0">
-            A template helps first-time contributors submit complete pull
-            requests.
-          </p>
-        </li>
-        <li class="rh-finding">
-          <span class="badge rh-sev rh-sev-info">Suggestion</span>
-          <span class="badge rh-kind">AI-generated</span>
-          <p class="mb-1 mt-2">
-            Consider adding a short "Quick start" section near the top of the
-            README.
-          </p>
-          <p class="small text-secondary mb-0">
-            AI suggestions are labeled and are never treated as scan results.
-          </p>
-        </li>
-      </ul>
+    <div class="rh-check-grid">
+      <article class="rh-check-card">
+        <span class="rh-check-number">01</span
+        ><span class="rh-check-icon"
+          ><i class="bi bi-journal-richtext" aria-hidden="true"></i
+        ></span>
+        <h3>Documentation</h3>
+        <p>
+          Check for a README, license, project description, and practical
+          installation, usage, and example guidance.
+        </p>
+        <span class="rh-check-tags"
+          >README <span>·</span> License <span>·</span> Usage</span
+        >
+      </article>
+      <article class="rh-check-card">
+        <span class="rh-check-number">02</span
+        ><span class="rh-check-icon"
+          ><i class="bi bi-terminal" aria-hidden="true"></i
+        ></span>
+        <h3>Testing &amp; CI</h3>
+        <p>
+          Look for test files, test configuration, continuous integration, and
+          commands that appear to run tests.
+        </p>
+        <span class="rh-check-tags"
+          >Test files <span>·</span> CI workflows <span>·</span> Commands</span
+        >
+      </article>
+      <article class="rh-check-card">
+        <span class="rh-check-number">03</span
+        ><span class="rh-check-icon"
+          ><i class="bi bi-person-hearts" aria-hidden="true"></i
+        ></span>
+        <h3>Contributor readiness</h3>
+        <p>
+          Find contribution instructions, a code of conduct, and issue and pull
+          request templates.
+        </p>
+        <span class="rh-check-tags"
+          >Guides <span>·</span> Conduct <span>·</span> Templates</span
+        >
+      </article>
     </div>
   </div>
 </section>
 
-<!-- About and contributing -->
-<section id="about" class="py-5">
-  <div class="container">
-    <h2 class="h3 fw-bold mb-3">About RepoHealth</h2>
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <p class="text-secondary">
-          RepoHealth is an open-source tool for checking the health of public
-          GitHub repositories. It reads repository data through GitHub's public
-          API and never runs code from the repositories it scans.
-        </p>
-        <p class="text-secondary mb-0">
-          Every report separates three kinds of output:
-          <strong>objective checks</strong>,
-          <strong>heuristic warnings</strong>, and
-          <strong>AI-generated suggestions</strong>. A clean report does not
-          prove a project is secure.
-        </p>
-      </div>
-      <div class="col-lg-6">
-        <h3 class="h5">Ways to contribute</h3>
-        <ul class="text-secondary mb-3">
-          <li>Frontend: improve layout, accessibility, and design</li>
-          <li>Documentation: tutorials, examples, and translations</li>
-          <li>Testing: add tests for scanner and scoring rules</li>
-          <li>Scanner rules: propose and implement new checks</li>
-          <li>
-            AI providers: add support for other open-weight model runtimes
-          </li>
-        </ul>
-        <p class="small text-secondary mb-0">
-          Contribution guidelines will be added to the project repository before
-          it is opened to the community.
-        </p>
-      </div>
+<section id="how-it-works" class="rh-process-section">
+  <div class="container rh-process-inner">
+    <div class="rh-process-intro">
+      <p class="rh-eyebrow">Transparent by design</p>
+      <h2>Useful context.<br />No black box.</h2>
+      <p>
+        Every report is grounded in the public repository data RepoHealth can
+        inspect. No synthetic scores, no code execution, no guesswork disguised
+        as certainty.
+      </p>
     </div>
+    <ol class="rh-process-list">
+      <li>
+        <span>01</span>
+        <div>
+          <h3>Share a public GitHub URL</h3>
+          <p>Paste the repository link—no account or installation needed.</p>
+        </div>
+      </li>
+      <li>
+        <span>02</span>
+        <div>
+          <h3>We inspect public metadata and files</h3>
+          <p>
+            The scan reads selected project files and never executes repository
+            code.
+          </p>
+        </div>
+      </li>
+      <li>
+        <span>03</span>
+        <div>
+          <h3>Review findings and next steps</h3>
+          <p>
+            Each check shows its status and, when available, evidence and
+            remediation guidance.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="about" class="rh-about-section">
+  <div class="container rh-about-inner">
+    <div>
+      <p class="rh-eyebrow">About RepoHealth</p>
+      <h2>A clearer first look at open source.</h2>
+    </div>
+    <p>
+      RepoHealth is an open-source tool for reviewing the visible foundations of
+      public GitHub repositories. It uses GitHub’s public API, does not run code
+      from the projects it scans, and explains when a check could not be
+      assessed. Treat every report as a starting point for human review.
+    </p>
   </div>
 </section>
 {% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+  defer
+></script>
+<script src="{{ url_for('static', filename='js/report.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 {% endblock %}
